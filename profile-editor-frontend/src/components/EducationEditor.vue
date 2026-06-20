@@ -1,5 +1,6 @@
 ﻿<script setup lang="ts">
 import { useResumeStore } from '@/stores/resume'
+import RichTextEditor from './RichTextEditor.vue'
 
 const store = useResumeStore()
 </script>
@@ -55,11 +56,12 @@ const store = useResumeStore()
           </a-col>
         </a-row>
         <a-form-item label="证书与荣誉">
-          <a-textarea
-            :value="edu.awards"
-            @update:value="(v: string) => store.updateEducation(edu.id, { awards: v })"
-            placeholder="如：蓝桥杯 C++ B组 省二等奖，英语 CET-4"
-            :auto-size="{ minRows: 2, maxRows: 4 }"
+          <RichTextEditor
+            :model-value="edu.awards"
+            @update:model-value="(v: string) => store.updateEducation(edu.id, { awards: v })"
+            placeholder="如：蓝桥杯 C++ B组 省二等奖，英语 CET-4，选中文字后按 Ctrl+B 加粗"
+            :min-height="60"
+            :max-height="120"
           />
         </a-form-item>
       </a-form>

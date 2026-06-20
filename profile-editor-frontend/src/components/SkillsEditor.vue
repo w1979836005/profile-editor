@@ -1,27 +1,31 @@
 ﻿<script setup lang="ts">
 import { useResumeStore } from '@/stores/resume'
+import RichTextEditor from './RichTextEditor.vue'
 
 const store = useResumeStore()
 </script>
 
 <template>
   <div class="skills-editor">
-    <div v-for="skill in store.skills" :key="skill.id" class="skill-row">
-      <a-input
-        :value="skill.label"
-        @update:value="(v: string) => store.updateSkill(skill.id, { label: v })"
-        placeholder="标签"
-        class="skill-label"
+    <div v-for="skill in store.skills" :key="skill.id" class="skill-item">
+      <div class="skill-header">
+        <a-input
+          :value="skill.label"
+          @update:value="(v: string) => store.updateSkill(skill.id, { label: v })"
+          placeholder="技能标签"
+          class="skill-label"
+        />
+        <a-button type="link" danger size="small" @click="store.removeSkill(skill.id)">
+          删除
+        </a-button>
+      </div>
+      <RichTextEditor
+        :model-value="skill.content"
+        @update:model-value="(v: string) => store.updateSkill(skill.id, { content: v })"
+        placeholder="技能描述，选中文字后按 Ctrl+B 加粗"
+        :min-height="40"
+        :max-height="100"
       />
-      <a-input
-        :value="skill.content"
-        @update:value="(v: string) => store.updateSkill(skill.id, { content: v })"
-        placeholder="技能描述"
-        class="skill-content"
-      />
-      <a-button type="link" danger size="small" @click="store.removeSkill(skill.id)">
-        删除
-      </a-button>
     </div>
     <a-button type="dashed" block @click="store.addSkill">
       + 添加技能
@@ -30,17 +34,28 @@ const store = useResumeStore()
 </template>
 
 <style scoped>
-.skill-row {
+.skills-editor {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skill-item {
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 12px;
+  background: #fafafa;
+}
+
+.skill-header {
+  display: flex;
   align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
 }
+
 .skill-label {
-  width: 120px;
+  width: 150px;
   flex-shrink: 0;
-}
-.skill-content {
-  flex: 1;
 }
 </style>

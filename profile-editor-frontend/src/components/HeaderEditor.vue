@@ -1,7 +1,6 @@
 ﻿<script setup lang="ts">
 /**
  * 基本信息编辑器组件
- * 优化图片上传体验，支持实时预览
  */
 import { ref } from 'vue'
 import { useResumeStore } from '@/stores/resume'
@@ -126,7 +125,6 @@ function handlePhotoRemove() {
         <a-col :span="12">
           <a-form-item label="证件照">
             <div class="photo-upload-area">
-              <!-- 隐藏的文件输入 -->
               <input
                 ref="fileInputRef"
                 type="file"
@@ -134,13 +132,11 @@ function handlePhotoRemove() {
                 style="display: none"
                 @change="handleFileSelect"
               />
-              <!-- 上传触发区域 -->
               <div v-if="!store.header.photo" class="upload-trigger" @click="triggerFileSelect">
                 <LoadingOutlined v-if="uploading" />
                 <UploadOutlined v-else />
                 <span>{{ uploading ? '上传中...' : '上传照片' }}</span>
               </div>
-              <!-- 照片预览 -->
               <div v-if="store.header.photo" class="photo-preview">
                 <img :src="store.header.photo" alt="证件照预览" />
                 <div class="photo-actions">

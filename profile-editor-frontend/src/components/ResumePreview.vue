@@ -100,7 +100,7 @@ const orderedSections = computed(() => {
               <div class="exp-date">{{ edu.period }}</div>
             </div>
             <div class="exp-sub">{{ edu.college }}</div>
-            <div class="exp-desc">{{ edu.awards }}</div>
+            <div v-if="edu.awards" class="exp-desc" v-html="edu.awards"></div>
           </div>
         </template>
 
@@ -109,7 +109,7 @@ const orderedSections = computed(() => {
           <div class="section-title">专业技能</div>
           <ul>
             <li v-for="skill in store.skills" :key="skill.id">
-              <b>{{ skill.label }}：</b>{{ skill.content }}
+              <b>{{ skill.label }}：</b><span v-html="skill.content"></span>
             </li>
           </ul>
         </template>
