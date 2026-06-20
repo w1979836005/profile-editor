@@ -75,9 +75,9 @@ function handlePrint() {
 }
 
 .app-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #111;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
 
 .app-content {
@@ -102,6 +102,28 @@ function handlePrint() {
   flex: 1;
   overflow-y: auto;
   height: calc(100vh - 56px);
+}
+
+/* 自定义滚动条样式 */
+.editor-pane::-webkit-scrollbar,
+.preview-pane::-webkit-scrollbar {
+  width: 5px;
+}
+
+.editor-pane::-webkit-scrollbar-thumb,
+.preview-pane::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 3px;
+}
+
+.editor-pane::-webkit-scrollbar-thumb:hover,
+.preview-pane::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
+}
+
+.editor-pane::-webkit-scrollbar-track,
+.preview-pane::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* Mobile: hidden by default */
