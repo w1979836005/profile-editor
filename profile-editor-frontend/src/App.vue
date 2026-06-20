@@ -28,11 +28,21 @@ async function handleExportPDF() {
   const fileName = store.header.name ? `${store.header.name}_简历.pdf` : '简历.pdf'
 
   const opt = {
-    margin: 10,
+    margin: [0, 0, 0, 0],
     filename: fileName,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      width: 800,
+      windowWidth: 800,
+    },
+    jsPDF: {
+      unit: 'mm',
+      format: 'a4',
+      orientation: 'portrait' as const,
+    },
+    pagebreak: { mode: 'avoid-all' },
   }
 
   try {
