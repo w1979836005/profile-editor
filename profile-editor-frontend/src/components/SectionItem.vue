@@ -3,11 +3,13 @@
  * 可拖拽板块包装器组件
  * 支持拖拽排序、标题编辑、删除等功能
  */
-import { ref } from 'vue'
-import { HolderOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
+import { computed, ref } from 'vue'
+import { HolderOutlined, DeleteOutlined, EditOutlined, RightOutlined, DownOutlined } from '@ant-design/icons-vue'
+import { useUIStore } from '@/stores/ui'
 
 const props = withDefaults(
   defineProps<{
+    id: string
     title: string
     draggable?: boolean
     editable?: boolean
@@ -18,7 +20,7 @@ const props = withDefaults(
     draggable: false,
     editable: false,
     deletable: false,
-    defaultExpanded: true,
+    defaultExpanded: false,
   },
 )
 
@@ -30,12 +32,20 @@ const emit = defineEmits<{
   (e: 'update:title', title: string): void
 }>()
 
-const expanded = ref(props.defaultExpanded)
+const uiStore = useUIStore()
 const isEditing = ref(false)
 const editTitle = ref(props.title)
 
 /**
- * 处理拖拽开始
+ * 计算属性：板块是否展开
+ */
+const expanded = computed({
+  get: () => uiStore.isSectionExpanded(props.id, props.defaultExpanded),
+  set: (value: boolean) => uiStore.setSectionExpanded(props.id, value),
+})
+
+/**
+ * 处理拖拽开始（仅在拖拽手柄上触发）
  */
 function handleDragStart(event: DragEvent) {
   if (!props.draggable) return
@@ -89,15 +99,18 @@ function cancelEdit() {
 <template>
   <div
     class="section-item"
-    :class="{ 'is-draggable': props.draggable }"
-    :draggable="props.draggable"
-    @dragstart="handleDragStart"
+    :class="{ 'is-expanded': expanded }"
     @dragover="handleDragOver"
     @drop="handleDrop"
   >
     <div class="section-header" @click="expanded = !expanded">
       <div class="header-left">
-        <div v-if="props.draggable" class="drag-handle">
+        <div
+          v-if="props.draggable"
+          class="drag-handle"
+          draggable="true"
+          @dragstart="handleDragStart"
+        >
           <HolderOutlined />
         </div>
         <div v-if="isEditing" class="title-edit" @click.stop>
@@ -130,7 +143,8 @@ function cancelEdit() {
         >
           <DeleteOutlined />
         </a-button>
-        <span class="expand-icon">{{ expanded ? '▼' : '▶' }}</span>
+        <DownOutlined v-if="expanded" class="expand-icon" />
+        <RightOutlined v-else class="expand-icon" />
       </div>
     </div>
     <div v-show="expanded" class="section-content">
@@ -148,14 +162,6 @@ function cancelEdit() {
   overflow: hidden;
 }
 
-.section-item.is-draggable {
-  transition: opacity 0.2s;
-}
-
-.section-item.is-draggable:active {
-  opacity: 0.5;
-}
-
 .section-header {
   display: flex;
   align-items: center;
@@ -164,6 +170,11 @@ function cancelEdit() {
   cursor: pointer;
   user-select: none;
   background: #fafafa;
+  border-bottom: 1px solid transparent;
+  transition: background 0.2s;
+}
+
+.section-item.is-expanded .section-header {
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -212,9 +223,10 @@ function cancelEdit() {
 }
 
 .expand-icon {
-  font-size: 10px;
+  font-size: 12px;
   color: #999;
   margin-left: 8px;
+  transition: transform 0.2s;
 }
 
 .section-content {

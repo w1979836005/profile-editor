@@ -104,7 +104,7 @@ function handleUpdateSectionTitle(id: string, title: string) {
 <template>
   <div class="editor-view">
     <!-- 基本信息（固定在最上面，不可拖拽） -->
-    <SectionItem title="基本信息" :default-expanded="true">
+    <SectionItem id="header" title="基本信息">
       <HeaderEditor />
     </SectionItem>
 
@@ -118,9 +118,9 @@ function handleUpdateSectionTitle(id: string, title: string) {
       <!-- 内置板块 -->
       <SectionItem
         v-if="section.type === 'education'"
+        :id="section.id"
         :title="getSectionTitle(section)"
         :draggable="true"
-        :default-expanded="true"
         @dragstart="handleDragStart(index)"
         @dragover="handleDragOver(index)"
         @drop="handleDrop(index)"
@@ -130,9 +130,9 @@ function handleUpdateSectionTitle(id: string, title: string) {
 
       <SectionItem
         v-else-if="section.type === 'skills'"
+        :id="section.id"
         :title="getSectionTitle(section)"
         :draggable="true"
-        :default-expanded="true"
         @dragstart="handleDragStart(index)"
         @dragover="handleDragOver(index)"
         @drop="handleDrop(index)"
@@ -142,9 +142,9 @@ function handleUpdateSectionTitle(id: string, title: string) {
 
       <SectionItem
         v-else-if="section.type === 'experiences'"
+        :id="section.id"
         :title="getSectionTitle(section)"
         :draggable="true"
-        :default-expanded="true"
         @dragstart="handleDragStart(index)"
         @dragover="handleDragOver(index)"
         @drop="handleDrop(index)"
@@ -154,9 +154,9 @@ function handleUpdateSectionTitle(id: string, title: string) {
 
       <SectionItem
         v-else-if="section.type === 'projects'"
+        :id="section.id"
         :title="getSectionTitle(section)"
         :draggable="true"
-        :default-expanded="true"
         @dragstart="handleDragStart(index)"
         @dragover="handleDragOver(index)"
         @drop="handleDrop(index)"
@@ -167,11 +167,11 @@ function handleUpdateSectionTitle(id: string, title: string) {
       <!-- 自定义板块 -->
       <SectionItem
         v-else-if="section.type === 'custom'"
+        :id="section.id"
         :title="getSectionTitle(section)"
         :draggable="true"
         :editable="true"
         :deletable="true"
-        :default-expanded="true"
         @dragstart="handleDragStart(index)"
         @dragover="handleDragOver(index)"
         @drop="handleDrop(index)"
