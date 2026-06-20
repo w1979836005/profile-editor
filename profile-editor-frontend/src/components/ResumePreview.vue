@@ -1,7 +1,40 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useResumeStore } from '@/stores/resume'
+import type { CustomSection } from '@/types/resume'
 
 const store = useResumeStore()
+
+/**
+ * 板块标题映射
+ */
+const sectionTitleMap: Record<string, string> = {
+  education: '教育经历',
+  skills: '专业技能',
+  experiences: '实习经历',
+  projects: '项目经历',
+}
+
+/**
+ * 获取排序后的板块列表
+ */
+const orderedSections = computed(() => {
+  return store.data.sectionOrder.map((section) => {
+    if (section.type === 'custom') {
+      const custom = store.data.customSections.find((s) => s.id === section.id)
+      return {
+        ...section,
+        title: custom?.title || '自定义板块',
+        data: custom,
+      }
+    }
+    return {
+      ...section,
+      title: sectionTitleMap[section.id] || section.id,
+      data: null,
+    }
+  })
+})
 </script>
 
 <template>
@@ -56,52 +89,93 @@ const store = useResumeStore()
         </div>
       </div>
 
-      <!-- 教育经历 -->
-      <div class="section-title">教育经历</div>
-      <div v-for="edu in store.data.education" :key="edu.id" class="exp-item">
-        <div class="exp-head">
-          <div class="exp-left">{{ edu.school }} <span class="role">{{ edu.major }}</span></div>
-          <div class="exp-date">{{ edu.period }}</div>
-        </div>
-        <div class="exp-sub">{{ edu.college }}</div>
-        <div class="exp-desc">{{ edu.awards }}</div>
-      </div>
+      <!-- 按 sectionOrder 顺序渲染板块 -->
+      <template v-for="section in orderedSections" :key="section.id">
+        <!-- 教育经历 -->
+        <template v-if="section.type === 'education'">
+          <div class="section-title">教育经历</div>
+          <div v-for="edu in store.data.education" :key="edu.id" class="exp-item">
+            <div class="exp-head">
+              <div class="exp-left">{{ edu.school }} <span class="role">{{ edu.major }}</span></div>
+              <div class="exp-date">{{ edu.period }}</div>
+            </div>
+            <div class="exp-sub">{{ edu.college }}</div>
+            <div class="exp-desc">{{ edu.awards }}</div>
+          </div>
+        </template>
 
-      <!-- 专业技能 -->
-      <div class="section-title">专业技能</div>
-      <ul>
-        <li v-for="skill in store.data.skills" :key="skill.id">
-          <b>{{ skill.label }}：</b>{{ skill.content }}
-        </li>
-      </ul>
+        <!-- 专业技能 -->
+        <template v-else-if="section.type === 'skills'">
+          <div class="section-title">专业技能</div>
+          <ul>
+            <li v-for="skill in store.data.skills" :key="skill.id">
+              <b>{{ skill.label }}：</b>{{ skill.content }}
+            </li>
+          </ul>
+        </template>
 
-      <!-- 实习经历 -->
-      <div class="section-title">实习经历</div>
-      <div v-for="exp in store.data.experiences" :key="exp.id" class="exp-item">
-        <div class="exp-head">
-          <div class="exp-left">{{ exp.company }} <span class="role">{{ exp.role }}</span></div>
-          <div class="exp-date">{{ exp.period }}</div>
-        </div>
-        <div v-if="exp.description" class="exp-desc" v-html="exp.description"></div>
-        <div v-if="exp.techStack" class="tech-line"><b>主要技术：</b>{{ exp.techStack }}</div>
-        <ol v-if="exp.highlights.length">
-          <li v-for="(h, i) in exp.highlights" :key="i" v-html="h"></li>
-        </ol>
-      </div>
+        <!-- 实习经历 -->
+        <template v-else-if="section.type === 'experiences'">
+          <div class="section-title">实习经历</div>
+          <div v-for="exp in store.data.experiences" :key="exp.id" class="exp-item">
+            <div class="exp-head">
+              <div class="exp-left">{{ exp.company }} <span class="role">{{ exp.role }}</span></div>
+              <div class="exp-date">{{ exp.period }}</div>
+            </div>
+            <div v-if="exp.description" class="exp-desc" v-html="exp.description"></div>
+            <div v-if="exp.techStack" class="tech-line"><b>主要技术：</b>{{ exp.techStack }}</div>
+            <ol v-if="exp.highlights.length">
+              <li v-for="(h, i) in exp.highlights" :key="i" v-html="h"></li>
+            </ol>
+          </div>
+        </template>
 
-      <!-- 项目经历 -->
-      <div class="section-title">项目经历</div>
-      <div v-for="proj in store.data.projects" :key="proj.id" class="exp-item">
-        <div class="exp-head">
-          <div class="exp-left">{{ proj.name }}</div>
-          <div class="exp-date">{{ proj.period }}</div>
-        </div>
-        <div v-if="proj.description" class="exp-desc" v-html="proj.description"></div>
-        <div v-if="proj.techStack" class="tech-line"><b>主要技术：</b>{{ proj.techStack }}</div>
-        <ol v-if="proj.highlights.length">
-          <li v-for="(h, i) in proj.highlights" :key="i" v-html="h"></li>
-        </ol>
-      </div>
+        <!-- 项目经历 -->
+        <template v-else-if="section.type === 'projects'">
+          <div class="section-title">项目经历</div>
+          <div v-for="proj in store.data.projects" :key="proj.id" class="exp-item">
+            <div class="exp-head">
+              <div class="exp-left">{{ proj.name }}</div>
+              <div class="exp-date">{{ proj.period }}</div>
+            </div>
+            <div v-if="proj.description" class="exp-desc" v-html="proj.description"></div>
+            <div v-if="proj.techStack" class="tech-line"><b>主要技术：</b>{{ proj.techStack }}</div>
+            <ol v-if="proj.highlights.length">
+              <li v-for="(h, i) in proj.highlights" :key="i" v-html="h"></li>
+            </ol>
+          </div>
+        </template>
+
+        <!-- 自定义板块 -->
+        <template v-else-if="section.type === 'custom' && section.data">
+          <div class="section-title">{{ section.data.title }}</div>
+          <div v-for="field in (section.data as CustomSection).fields" :key="field.id" class="custom-field">
+            <!-- 文本字段 -->
+            <div v-if="field.type === 'text' && field.value" class="exp-desc">
+              <b v-if="field.label">{{ field.label }}：</b>{{ field.value }}
+            </div>
+            <!-- 富文本字段 -->
+            <div v-else-if="field.type === 'richtext' && field.value" class="exp-desc">
+              <b v-if="field.label">{{ field.label }}：</b><span v-html="field.value"></span>
+            </div>
+            <!-- 时间段字段 -->
+            <div v-else-if="field.type === 'period' && field.value" class="exp-date">
+              <b v-if="field.label">{{ field.label }}：</b>{{ field.value }}
+            </div>
+            <!-- 链接字段 -->
+            <div v-else-if="field.type === 'link' && field.url" class="exp-desc">
+              <b v-if="field.label">{{ field.label }}：</b>
+              <a :href="field.url" class="resume-link">{{ field.text || field.url }}</a>
+            </div>
+            <!-- 列表字段 -->
+            <ul v-else-if="field.type === 'list' && field.items.length">
+              <li v-for="(item, i) in field.items" :key="i">
+                <b v-if="field.label && i === 0">{{ field.label }}：</b>{{ item }}
+              </li>
+            </ul>
+          </div>
+        </template>
+      </template>
     </div>
   </div>
 </template>
@@ -294,5 +368,14 @@ ol li {
 b,
 strong {
   color: #111;
+}
+
+.resume-link {
+  color: #1890ff;
+  text-decoration: underline;
+}
+
+.custom-field {
+  margin-bottom: 2px;
 }
 </style>
