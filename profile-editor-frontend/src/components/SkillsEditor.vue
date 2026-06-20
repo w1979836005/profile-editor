@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { useResumeStore } from '@/stores/resume'
 
 const store = useResumeStore()
@@ -6,7 +6,7 @@ const store = useResumeStore()
 
 <template>
   <div class="skills-editor">
-    <div v-for="skill in store.data.skills" :key="skill.id" class="skill-row">
+    <div v-for="skill in store.skills" :key="skill.id" class="skill-row">
       <a-input
         :value="skill.label"
         @update:value="(v: string) => store.updateSkill(skill.id, { label: v })"

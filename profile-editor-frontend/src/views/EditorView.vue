@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 /**
  * 编辑器视图组件
  * 支持板块拖拽排序和自定义板块
@@ -36,7 +36,7 @@ const sectionTitleMap: Record<string, string> = {
  */
 function getSectionTitle(section: { id: string; type: string }): string {
   if (section.type === 'custom') {
-    const custom = store.data.customSections.find((s) => s.id === section.id)
+    const custom = store.customSections.find((s) => s.id === section.id)
     return custom?.title || '自定义板块'
   }
   return sectionTitleMap[section.id] || section.id
@@ -110,7 +110,7 @@ function handleUpdateSectionTitle(id: string, title: string) {
 
     <!-- 可排序的板块 -->
     <div
-      v-for="(section, index) in store.data.sectionOrder"
+      v-for="(section, index) in store.sectionOrder"
       :key="section.id"
       :class="{ 'drag-over': dragOverIndex === index }"
       @dragend="handleDragEnd"
@@ -179,7 +179,7 @@ function handleUpdateSectionTitle(id: string, title: string) {
         @update:title="(t: string) => handleUpdateSectionTitle(section.id, t)"
       >
         <CustomSectionEditor
-          :section="store.data.customSections.find((s) => s.id === section.id)!"
+          :section="store.customSections.find((s) => s.id === section.id)!"
         />
       </SectionItem>
     </div>

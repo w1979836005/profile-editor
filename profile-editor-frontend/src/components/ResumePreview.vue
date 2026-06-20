@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { computed } from 'vue'
 import { useResumeStore } from '@/stores/resume'
 import type { CustomSection } from '@/types/resume'
@@ -19,9 +19,9 @@ const sectionTitleMap: Record<string, string> = {
  * 获取排序后的板块列表
  */
 const orderedSections = computed(() => {
-  return store.data.sectionOrder.map((section) => {
+  return store.sectionOrder.map((section) => {
     if (section.type === 'custom') {
-      const custom = store.data.customSections.find((s) => s.id === section.id)
+      const custom = store.customSections.find((s) => s.id === section.id)
       return {
         ...section,
         title: custom?.title || '自定义板块',
@@ -43,21 +43,21 @@ const orderedSections = computed(() => {
       <!-- HEADER -->
       <div class="header">
         <div class="header-left">
-          <div class="name">{{ store.data.header.name }}</div>
+          <div class="name">{{ store.header.name }}</div>
           <div class="contact-row">
             <span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="5" y="2" width="14" height="20" rx="2" />
                 <line x1="12" y1="18" x2="12.01" y2="18" />
               </svg>
-              {{ store.data.header.phone }}
+              {{ store.header.phone }}
             </span>
             <span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="2" y="4" width="20" height="16" rx="2" />
                 <polyline points="2 7 12 13 22 7" />
               </svg>
-              {{ store.data.header.email }}
+              {{ store.header.email }}
             </span>
           </div>
           <div class="contact-row">
@@ -66,7 +66,7 @@ const orderedSections = computed(() => {
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
-              {{ store.data.header.status }}
+              {{ store.header.status }}
             </span>
             <span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -74,15 +74,15 @@ const orderedSections = computed(() => {
                 <line x1="8" y1="21" x2="16" y2="21" />
                 <line x1="12" y1="17" x2="12" y2="21" />
               </svg>
-              {{ store.data.header.title }}
+              {{ store.header.title }}
             </span>
           </div>
         </div>
         <div class="header-right">
           <img
-            v-if="store.data.header.photo"
+            v-if="store.header.photo"
             class="photo"
-            :src="store.data.header.photo"
+            :src="store.header.photo"
             alt="证件照"
           />
           <div v-else class="photo photo-placeholder">证件照</div>
@@ -94,7 +94,7 @@ const orderedSections = computed(() => {
         <!-- 教育经历 -->
         <template v-if="section.type === 'education'">
           <div class="section-title">教育经历</div>
-          <div v-for="edu in store.data.education" :key="edu.id" class="exp-item">
+          <div v-for="edu in store.education" :key="edu.id" class="exp-item">
             <div class="exp-head">
               <div class="exp-left">{{ edu.school }} <span class="role">{{ edu.major }}</span></div>
               <div class="exp-date">{{ edu.period }}</div>
@@ -108,7 +108,7 @@ const orderedSections = computed(() => {
         <template v-else-if="section.type === 'skills'">
           <div class="section-title">专业技能</div>
           <ul>
-            <li v-for="skill in store.data.skills" :key="skill.id">
+            <li v-for="skill in store.skills" :key="skill.id">
               <b>{{ skill.label }}：</b>{{ skill.content }}
             </li>
           </ul>
@@ -117,7 +117,7 @@ const orderedSections = computed(() => {
         <!-- 实习经历 -->
         <template v-else-if="section.type === 'experiences'">
           <div class="section-title">实习经历</div>
-          <div v-for="exp in store.data.experiences" :key="exp.id" class="exp-item">
+          <div v-for="exp in store.experiences" :key="exp.id" class="exp-item">
             <div class="exp-head">
               <div class="exp-left">{{ exp.company }} <span class="role">{{ exp.role }}</span></div>
               <div class="exp-date">{{ exp.period }}</div>
@@ -133,7 +133,7 @@ const orderedSections = computed(() => {
         <!-- 项目经历 -->
         <template v-else-if="section.type === 'projects'">
           <div class="section-title">项目经历</div>
-          <div v-for="proj in store.data.projects" :key="proj.id" class="exp-item">
+          <div v-for="proj in store.projects" :key="proj.id" class="exp-item">
             <div class="exp-head">
               <div class="exp-left">{{ proj.name }}</div>
               <div class="exp-date">{{ proj.period }}</div>

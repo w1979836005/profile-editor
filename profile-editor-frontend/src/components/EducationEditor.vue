@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { useResumeStore } from '@/stores/resume'
 
 const store = useResumeStore()
@@ -6,7 +6,7 @@ const store = useResumeStore()
 
 <template>
   <div class="education-editor">
-    <div v-for="(edu, index) in store.data.education" :key="edu.id" class="section-card">
+    <div v-for="(edu, index) in store.education" :key="edu.id" class="section-card">
       <div class="card-header">
         <span class="card-title">教育经历 {{ index + 1 }}</span>
         <a-button type="link" danger size="small" @click="store.removeEducation(edu.id)">

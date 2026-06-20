@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { useResumeStore } from '@/stores/resume'
 import RichTextEditor from './RichTextEditor.vue'
 
@@ -7,7 +7,7 @@ const store = useResumeStore()
 
 <template>
   <div class="experience-editor">
-    <div v-for="(exp, index) in store.data.experiences" :key="exp.id" class="section-card">
+    <div v-for="(exp, index) in store.experiences" :key="exp.id" class="section-card">
       <div class="card-header">
         <span class="card-title">实习经历 {{ index + 1 }}</span>
         <a-button type="link" danger size="small" @click="store.removeExperience(exp.id)">
