@@ -3,23 +3,47 @@ import { ref } from 'vue'
 import { RouterView } from 'vue-router'
 import { message } from 'ant-design-vue'
 import ResumePreview from '@/components/ResumePreview.vue'
+import html2pdf from 'html2pdf.js'
 
 const activeTab = ref<string>('edit')
 const exporting = ref(false)
 
 /**
  * 导出 PDF
- * 使用浏览器打印功能，用户可选择保存为 PDF
+ * 使用 html2pdf.js 直接下载 PDF
  */
-function handleExportPDF() {
+async function handleExportPDF() {
   exporting.value = true
-  message.loading({ content: '正在准备导出...', key: 'export' })
 
-  setTimeout(() => {
-    window.print()
+  // 获取预览区域的 DOM 元素
+  const element = document.querySelector('.resume') as HTMLElement
+  if (!element) {
+    message.error('未找到预览内容')
     exporting.value = false
-    message.success({ content: '导出完成！请在打印对话框中选择"另存为 PDF"', key: 'export', duration: 3 })
-  }, 300)
+    return
+  }
+
+  // 获取用户姓名作为文件名
+  const store = await import('@/stores/resume').then((m) => m.useResumeStore())
+  const fileName = store.header.name ? `${store.header.name}_简历.pdf` : '简历.pdf'
+
+  const opt = {
+    margin: 10,
+    filename: fileName,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
+  }
+
+  try {
+    await html2pdf().set(opt).from(element).save()
+    message.success('PDF 导出成功！')
+  } catch (error) {
+    console.error('[ExportPDF] 导出失败:', error)
+    message.error('PDF 导出失败，请重试')
+  } finally {
+    exporting.value = false
+  }
 }
 </script>
 
@@ -84,6 +108,12 @@ function handleExportPDF() {
 .header-left {
   display: flex;
   align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .app-title {
@@ -190,10 +220,19 @@ function handleExportPDF() {
     background: #fff !important;
   }
 
-  /* 确保打印时页面尺寸正确 */
+  /* 确保打印时页面尺寸正确，移除默认页眉页脚 */
   @page {
     size: A4;
-    margin: 10mm;
+    margin: 10mm 10mm 10mm 10mm;
+  }
+
+  /* 移除浏览器默认的页眉页脚 */
+  @page :header {
+    display: none;
+  }
+
+  @page :footer {
+    display: none;
   }
 
   body {
