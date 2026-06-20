@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useResumeStore } from '@/stores/resume'
+import RichTextEditor from './RichTextEditor.vue'
 
 const store = useResumeStore()
 </script>
@@ -35,11 +36,12 @@ const store = useResumeStore()
           </a-col>
         </a-row>
         <a-form-item label="项目描述">
-          <a-textarea
-            :value="proj.description"
-            @update:value="(v: string) => store.updateProject(proj.id, { description: v })"
-            placeholder="项目概述（支持 HTML 加粗标签 &lt;b&gt;）"
-            :auto-size="{ minRows: 2, maxRows: 6 }"
+          <RichTextEditor
+            :model-value="proj.description"
+            @update:model-value="(v: string) => store.updateProject(proj.id, { description: v })"
+            placeholder="项目概述，选中文字后按 Ctrl+B 加粗"
+            :min-height="60"
+            :max-height="150"
           />
         </a-form-item>
         <a-form-item label="技术栈">
@@ -51,13 +53,15 @@ const store = useResumeStore()
         </a-form-item>
         <a-form-item label="工作亮点">
           <div v-for="(h, i) in proj.highlights" :key="i" class="highlight-row">
-            <a-textarea
-              :value="h"
-              @update:value="(v: string) => store.updateProjectHighlight(proj.id, i, v)"
-              placeholder="工作亮点描述（支持 HTML 加粗标签）"
-              :auto-size="{ minRows: 1, maxRows: 3 }"
-              class="highlight-input"
-            />
+            <div class="highlight-input">
+              <RichTextEditor
+                :model-value="h"
+                @update:model-value="(v: string) => store.updateProjectHighlight(proj.id, i, v)"
+                placeholder="工作亮点描述，选中文字后按 Ctrl+B 加粗"
+                :min-height="40"
+                :max-height="100"
+              />
+            </div>
             <a-button
               type="link"
               danger
