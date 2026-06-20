@@ -1,15 +1,25 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { RouterView } from 'vue-router'
+import { message } from 'ant-design-vue'
 import ResumePreview from '@/components/ResumePreview.vue'
 
 const activeTab = ref<string>('edit')
+const exporting = ref(false)
 
-function handlePrint() {
-  activeTab.value = 'preview'
+/**
+ * 导出 PDF
+ * 使用浏览器打印功能，用户可选择保存为 PDF
+ */
+function handleExportPDF() {
+  exporting.value = true
+  message.loading({ content: '正在准备导出...', key: 'export' })
+
   setTimeout(() => {
     window.print()
-  }, 100)
+    exporting.value = false
+    message.success({ content: '导出完成！请在打印对话框中选择"另存为 PDF"', key: 'export', duration: 3 })
+  }, 300)
 }
 </script>
 
@@ -20,7 +30,9 @@ function handlePrint() {
         <span class="app-title">简历制作工具</span>
       </div>
       <div class="header-right">
-        <a-button @click="handlePrint" type="primary">导出 PDF</a-button>
+        <a-button @click="handleExportPDF" type="primary" :loading="exporting">
+          {{ exporting ? '导出中...' : '导出 PDF' }}
+        </a-button>
       </div>
     </a-layout-header>
 
@@ -149,21 +161,44 @@ function handlePrint() {
   }
 }
 
+/* 打印样式优化 */
 @media print {
+  /* 隐藏非打印元素 */
   .app-header,
   .editor-pane,
   .mobile-layout {
     display: none !important;
   }
+
+  /* 确保预览面板完整显示 */
   .desktop-layout {
     display: flex !important;
   }
+
   .editor-pane {
     display: none !important;
   }
+
   .preview-pane {
     overflow: visible !important;
     height: auto !important;
+    width: 100% !important;
+  }
+
+  /* 移除背景色和阴影 */
+  .app-layout {
+    background: #fff !important;
+  }
+
+  /* 确保打印时页面尺寸正确 */
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 }
 </style>
